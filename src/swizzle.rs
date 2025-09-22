@@ -180,6 +180,7 @@ pub(crate) fn swizzle_inner<const DESWIZZLE: bool>(
     let block_width = 1;
     let block_size_in_bytes = GOB_SIZE_IN_BYTES * block_width * block_height * block_depth;
     let block_height_in_bytes = GOB_HEIGHT_IN_BYTES * block_height;
+    let is_orin = true; // Temp parameter. Needs to be in swizzle_inner arguments
 
     // Tiling is defined as a mapping from byte coordinates x,y,z -> x',y',z'.
     // We step a GOB of bytes at a time to optimize the inner loop with SIMD loads/stores.
@@ -207,7 +208,7 @@ pub(crate) fn swizzle_inner<const DESWIZZLE: bool>(
 
                 // Check if we can use the fast path.
                 if x0 + GOB_WIDTH_IN_BYTES < width * bytes_per_pixel
-                    && y0 + GOB_HEIGHT_IN_BYTES < height
+                    && y0 + GOB_HEIGHT_IN_BYTES < height && !is_orin // Todo setup fast path for orin swizzle layout
                 {
                     let linear_offset = (z0 * width * height * bytes_per_pixel)
                         + (y0 * width * bytes_per_pixel)
@@ -240,6 +241,7 @@ pub(crate) fn swizzle_inner<const DESWIZZLE: bool>(
                         height,
                         bytes_per_pixel,
                         gob_address,
+                        is_orin,
                     );
                 }
             }
@@ -257,11 +259,19 @@ fn swizzle_deswizzle_gob<const DESWIZZLE: bool>(
     height: u32,
     bytes_per_pixel: u32,
     gob_address: usize,
+    is_orin: bool,
 ) {
+
     for y in 0..GOB_HEIGHT_IN_BYTES {
         for x in 0..GOB_WIDTH_IN_BYTES {
             if y0 + y < height && x0 + x < width * bytes_per_pixel {
-                let swizzled_offset = gob_address + gob_offset_orin(x, y) as usize;
+                let swizzled_offset = gob_address
+                    + if is_orin {
+                        gob_offset_orin(x, y)
+                    } else {
+                        gob_offset(x, y)
+                    } as usize;
+
                 let linear_offset = (z0 * width * height * bytes_per_pixel)
                     + ((y0 + y) * width * bytes_per_pixel)
                     + x0
