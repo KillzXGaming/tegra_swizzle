@@ -261,7 +261,7 @@ fn swizzle_deswizzle_gob<const DESWIZZLE: bool>(
     for y in 0..GOB_HEIGHT_IN_BYTES {
         for x in 0..GOB_WIDTH_IN_BYTES {
             if y0 + y < height && x0 + x < width * bytes_per_pixel {
-                let swizzled_offset = gob_address + gob_offset(x, y) as usize;
+                let swizzled_offset = gob_address + gob_offset_orin(x, y) as usize;
                 let linear_offset = (z0 * width * height * bytes_per_pixel)
                     + ((y0 + y) * width * bytes_per_pixel)
                     + x0
@@ -320,6 +320,14 @@ fn gob_offset(x: u32, y: u32) -> u32 {
     // TODO: Optimize this?
     // TODO: Describe the pattern here?
     ((x % 64) / 32) * 256 + ((y % 8) / 2) * 64 + ((x % 32) / 16) * 32 + (y % 2) * 16 + (x % 16)
+}
+
+// Code taken from examples in Orin TRM
+// Return the offset within the GOB for the byte at location (x, y).
+fn gob_offset_orin(x: u32, y: u32) -> u32 {
+    // TODO: Optimize this?
+    // TODO: Describe the pattern here?
+    ((x % 64) / 32) * 256 + ((y % 8) / 4) * 128 + ((x % 32) / 16) * 64 + (y % 4) * 16 + (x % 16)
 }
 
 // TODO: Investigate using macros to generate this code.
