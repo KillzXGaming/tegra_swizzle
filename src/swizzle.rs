@@ -57,6 +57,7 @@ pub fn swizzle_block_linear(
     source: &[u8],
     block_height: BlockHeight,
     bytes_per_pixel: u32,
+    is_orin: bool,
 ) -> Result<Vec<u8>, SwizzleError> {
     let mut destination =
         vec![0u8; swizzled_mip_size(width, height, depth, block_height, bytes_per_pixel)];
@@ -81,6 +82,7 @@ pub fn swizzle_block_linear(
         block_height,
         block_depth,
         bytes_per_pixel,
+        is_orin,
     );
     Ok(destination)
 }
@@ -133,6 +135,7 @@ pub fn deswizzle_block_linear(
     source: &[u8],
     block_height: BlockHeight,
     bytes_per_pixel: u32,
+    is_orin: bool,
 ) -> Result<Vec<u8>, SwizzleError> {
     let mut destination = vec![0u8; deswizzled_mip_size(width, height, depth, bytes_per_pixel)];
 
@@ -156,6 +159,7 @@ pub fn deswizzle_block_linear(
         block_height,
         block_depth,
         bytes_per_pixel,
+        is_orin,
     );
     Ok(destination)
 }
@@ -169,6 +173,7 @@ pub(crate) fn swizzle_inner<const DESWIZZLE: bool>(
     block_height: BlockHeight,
     block_depth: u32,
     bytes_per_pixel: u32,
+    is_orin: bool,
 ) {
     let block_height = block_height as u32;
     let width_in_gobs = width_in_gobs(width, bytes_per_pixel);
@@ -180,7 +185,6 @@ pub(crate) fn swizzle_inner<const DESWIZZLE: bool>(
     let block_width = 1;
     let block_size_in_bytes = GOB_SIZE_IN_BYTES * block_width * block_height * block_depth;
     let block_height_in_bytes = GOB_HEIGHT_IN_BYTES * block_height;
-    let is_orin = true; // Temp parameter. Needs to be in swizzle_inner arguments
 
     // Tiling is defined as a mapping from byte coordinates x,y,z -> x',y',z'.
     // We step a GOB of bytes at a time to optimize the inner loop with SIMD loads/stores.
