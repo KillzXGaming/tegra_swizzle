@@ -177,6 +177,7 @@ pub unsafe extern "C" fn swizzle_block_linear(
         BlockHeight::new(block_height).unwrap(),
         depth,
         bytes_per_pixel,
+        false,
     )
 }
 
@@ -211,6 +212,7 @@ pub unsafe extern "C" fn deswizzle_block_linear(
         BlockHeight::new(block_height).unwrap(),
         depth,
         bytes_per_pixel,
+        false,
     )
 }
 

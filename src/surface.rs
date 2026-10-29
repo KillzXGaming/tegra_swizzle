@@ -571,6 +571,7 @@ fn swizzle_mipmap<const DESWIZZLE: bool>(
         block_height,
         block_depth,
         bytes_per_pixel,
+        false,
     );
 
     if DESWIZZLE {
