@@ -32,6 +32,7 @@ pub unsafe extern "C" fn swizzle_surface(
     bytes_per_pixel: u32,
     mipmap_count: u32,
     array_count: u32,
+	is_orin: bool,
 ) {
     let source = std::slice::from_raw_parts(source, source_len);
     let mut destination = std::slice::from_raw_parts_mut(destination, destination_len);
@@ -47,6 +48,7 @@ pub unsafe extern "C" fn swizzle_surface(
         bytes_per_pixel,
         mipmap_count,
         array_count,
+		is_orin,
     )
     .unwrap();
 }
@@ -74,6 +76,7 @@ pub unsafe extern "C" fn deswizzle_surface(
     bytes_per_pixel: u32,
     mipmap_count: u32,
     array_count: u32,
+    is_orin: bool,
 ) {
     let source = std::slice::from_raw_parts(source, source_len);
     let mut destination = std::slice::from_raw_parts_mut(destination, destination_len);
@@ -89,6 +92,7 @@ pub unsafe extern "C" fn deswizzle_surface(
         bytes_per_pixel,
         mipmap_count,
         array_count,
+		is_orin,
     )
     .unwrap();
 }
@@ -164,6 +168,7 @@ pub unsafe extern "C" fn swizzle_block_linear(
     destination_len: usize,
     block_height: u32,
     bytes_per_pixel: u32,
+    is_orin: bool,
 ) {
     let source = std::slice::from_raw_parts(source, source_len);
     let destination = std::slice::from_raw_parts_mut(destination, destination_len);
@@ -177,7 +182,7 @@ pub unsafe extern "C" fn swizzle_block_linear(
         BlockHeight::new(block_height).unwrap(),
         depth,
         bytes_per_pixel,
-        false,
+		is_orin,
     )
 }
 
@@ -199,6 +204,7 @@ pub unsafe extern "C" fn deswizzle_block_linear(
     destination_len: usize,
     block_height: u32,
     bytes_per_pixel: u32,
+    is_orin: bool,
 ) {
     let source = std::slice::from_raw_parts(source, source_len);
     let destination = std::slice::from_raw_parts_mut(destination, destination_len);
@@ -212,7 +218,7 @@ pub unsafe extern "C" fn deswizzle_block_linear(
         BlockHeight::new(block_height).unwrap(),
         depth,
         bytes_per_pixel,
-        false,
+		is_orin,
     )
 }
 

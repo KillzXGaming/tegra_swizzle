@@ -145,6 +145,7 @@ pub fn swizzle_surface(
     bytes_per_pixel: u32,
     mipmap_count: u32,
     layer_count: u32,
+	is_orin: bool,
 ) -> Result<Vec<u8>, SwizzleError> {
     // Check for empty surfaces first to more reliably handle overflow.
     if width == 0
@@ -182,6 +183,7 @@ pub fn swizzle_surface(
         bytes_per_pixel,
         mipmap_count,
         layer_count,
+		is_orin,
     )?;
 
     Ok(result)
@@ -260,6 +262,7 @@ pub fn deswizzle_surface(
     bytes_per_pixel: u32,
     mipmap_count: u32,
     layer_count: u32,
+	is_orin: bool,
 ) -> Result<Vec<u8>, SwizzleError> {
     // Check for empty surfaces first to more reliably handle overflow.
     if width == 0
@@ -297,6 +300,7 @@ pub fn deswizzle_surface(
         bytes_per_pixel,
         mipmap_count,
         layer_count,
+		is_orin,
     )?;
 
     Ok(result)
@@ -313,6 +317,7 @@ pub(crate) fn swizzle_surface_inner<const DESWIZZLE: bool>(
     bytes_per_pixel: u32,
     mipmap_count: u32,
     layer_count: u32,
+	is_orin: bool,
 ) -> Result<(), SwizzleError> {
     let block_width = block_dim.width.get();
     let block_height = block_dim.height.get();
@@ -352,6 +357,7 @@ pub(crate) fn swizzle_surface_inner<const DESWIZZLE: bool>(
                 &mut src_offset,
                 result,
                 &mut dst_offset,
+				is_orin,
             )?;
         }
 
@@ -542,6 +548,7 @@ fn swizzle_mipmap<const DESWIZZLE: bool>(
     src_offset: &mut usize,
     dst: &mut [u8],
     dst_offset: &mut usize,
+	is_orin: bool,
 ) -> Result<(), SwizzleError> {
     let swizzled_size = swizzled_mip_size(with, height, depth, block_height, bytes_per_pixel);
     let deswizzled_size = deswizzled_mip_size(with, height, depth, bytes_per_pixel);
@@ -571,7 +578,7 @@ fn swizzle_mipmap<const DESWIZZLE: bool>(
         block_height,
         block_depth,
         bytes_per_pixel,
-        false,
+		is_orin,
     );
 
     if DESWIZZLE {
